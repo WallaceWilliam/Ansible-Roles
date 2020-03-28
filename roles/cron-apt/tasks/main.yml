@@ -1,0 +1,30 @@
+## https://github.com/WallaceWilliam
+---
+- set_fact:
+    _tmp: "{{ role_cron_apt }}"
+
+- set_fact:
+    role_cron_apt: "{{role_cron_apt_def | combine(_tmp) }}"
+
+- name: Install crop-apt
+  apt:
+    update_cache: true
+    package: cron-apt
+    state: present
+
+- name: Copy cron-apt default config
+  template:
+    src: config.j2
+    dest: /etc/cron-apt/config
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set mail system
+  lineinfile:
+   dest: /etc/dma/dma.conf
+   state: present
+   create: yes
+   regexp: "^\\s*#*SMARTHOST"
+   line: "SMARTHOST {{ role_cron_apt.dma_smarthost }}"
+  when: role_cron_apt.dma_smarthost is defined

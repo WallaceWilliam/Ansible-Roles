@@ -1,0 +1,5 @@
+role_adduser_def:
+  username: root
+  rsa_copy: true
+  sudoer: true
+  rsa_file: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"

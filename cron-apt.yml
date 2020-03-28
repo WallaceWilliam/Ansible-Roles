@@ -1,0 +1,15 @@
+# Run as follows:
+# ansible-playbook cron-apt.yml -e "hostname=test2"
+---
+- name: cron-apt
+  hosts: "{{ hostname }}"
+  become: yes
+  vars:
+    role_cron_apt:
+         'mailto': 'root@example.com'
+         'mailon': 'changes'
+         'dma_smarthost': 'smtp.example.com'
+  
+  roles:
+  - cron-apt
+

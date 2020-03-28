@@ -1,0 +1,12 @@
+# Run as follows:
+# ansible-playbook adduser.yml -e "hostname=test2" -e "ansible_user=test" -K
+---
+- name: Add user
+  hosts: "{{ hostname }}"
+  become: yes
+  vars:
+    role_adduser: 
+      username: ansible
+  
+  roles:
+  - adduser

@@ -1,0 +1,15 @@
+# Run as follows:
+# ansible-playbook logon-notify-mail.yml -e "hostname=test2"
+---
+- name: mailer-logon
+  hosts: "{{ hostname }}"
+  become: yes
+  vars:
+    role_logon_notify_mail: 
+      'domain': 'example.com'
+      'recepient': 'root'
+      'dma_smarthost': 'smtp.example.com'
+
+  roles:
+  - logon-notify-mail
+

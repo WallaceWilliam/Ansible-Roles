@@ -1,0 +1,32 @@
+## https://github.com/WallaceWilliam
+---
+
+# combine Default and User parameters
+- set_fact:
+    _tmp: "{{ role_adduser }}"
+- set_fact:
+    role_adduser: "{{ role_adduser_def | combine(_tmp) }}"
+
+
+- name: Add sudoer user "{{ role_adduser.username }}"
+  user:
+    name: "{{ role_adduser.username }}"
+    state: present
+    createhome: yes
+
+- name: Allow using "{{ role_adduser.username }}" without password
+  lineinfile:
+    dest: "/etc/sudoers.d/{{ role_adduser.username }}"
+    state: present
+    create: yes
+    regexp: "^{{ role_adduser.username }}"
+    line: "{{ role_adduser.username }} ALL=(root,root) NOPASSWD:ALL"
+    validate: 'visudo -cf %s'
+  when: role_adduser.sudoer
+
+- name: Set up authorized keys for the "{{ role_adduser.username }}"
+  authorized_key:
+    user: "{{ role_adduser.username }}"
+    state: present
+    key: "{{ role_adduser.rsa_file }}"
+  when: role_adduser.rsa_copy

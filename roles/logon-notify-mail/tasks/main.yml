@@ -1,0 +1,34 @@
+## https://github.com/WallaceWilliam
+---
+
+# combine Default and User parameters
+- set_fact:
+    _tmp: "{{ role_logon_notify_mail }}"
+- set_fact:
+    role_logon_notify_mail: "{{ role_logon_notify_mail_def | combine(_tmp) }}"
+
+- name: Copy script to {{ role_logon_notify_mail.script  }}
+  template:
+    src: login-notify.sh.j2
+    dest: "{{ role_logon_notify_mail.script }}"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Setup PAMd
+  lineinfile:
+    dest: "/etc/pam.d/sshd"
+    state: present
+    create: yes
+    regexp: "^#*\\s*session optional pam_exec.so seteuid {{ role_logon_notify_mail.script }}"
+    line: "session optional pam_exec.so seteuid {{ role_logon_notify_mail.script }}"
+
+- name: Set mail system
+  lineinfile:
+   dest: /etc/dma/dma.conf
+   state: present
+   create: yes
+   regexp: "^\\s*#*SMARTHOST"
+   line: "SMARTHOST {{ role_logon_notify_mail.dma_smarthost }}"
+  when: role_logon_notify_mail.dma_smarthost is defined
+

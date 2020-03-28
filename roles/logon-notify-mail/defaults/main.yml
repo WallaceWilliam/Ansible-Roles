@@ -1,0 +1,4 @@
+role_logon_notify_mail_def:
+  domain: "example.com"
+  recepient: "root"
+  script: "/etc/ssh/login-notify.sh"

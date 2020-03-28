@@ -1,0 +1,25 @@
+# meta file for 
+---
+galaxy_info:
+  role_name: useradd
+  author: WallaceWilliam
+  description: Add user in Debian-like systems
+  license: MIT
+  min_ansible_version: 2.9.0.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - precise
+        - trusty
+        - xenial
+        - bionic
+    - name: Debian
+      versions:
+        - wheezy
+        - jessie
+        - stretch
+  galaxy_tags:
+    - system
+    - packaging
+dependencies: []
+

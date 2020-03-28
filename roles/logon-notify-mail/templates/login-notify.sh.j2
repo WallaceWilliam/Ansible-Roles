@@ -1,0 +1,14 @@
+#!/bin/sh
+#login-notify.sh
+
+if [ "$PAM_TYPE" != "close_session" ]; then
+    domain="{{ role_logon_notify_mail.domain }}"
+    host="`hostname`"
+    sender="$host@$domain"
+    recepient="{{ role_logon_notify_mail.recepient }}@$domain"
+    subject="SSH Login: `date` =$PAM_USER= from =$PAM_RHOST= on =$host="
+    # Message to send, e.g. the current environment variables.
+    message="`env`"
+    echo -e 'From: '${sender}'\nSubject: '${subject}'\n\n'${message}'' | sendmail -f "$sender" "$recepient"
+fi
+

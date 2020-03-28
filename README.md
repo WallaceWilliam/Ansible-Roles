@@ -8,6 +8,7 @@ Role for add sudoer user
 Create remote user and copy rsa key
 
 Params:
+
 -username: User name will be created
 
 ### 2) cron-apt
@@ -15,6 +16,7 @@ Params:
 Role for notify about apt packages update
 
 Params:
+
 -mailto: mail for notify
 -mailon: 'changes'
 -dma_smarthost: smtp server
@@ -23,7 +25,8 @@ Params:
 
 Role for mail notify on ssh logon
 
-Params
+Params:
+
 -domain: mail domain
 -recepient: recepient
 -dma_smarthost: smtp server

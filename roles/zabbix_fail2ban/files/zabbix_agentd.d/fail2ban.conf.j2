@@ -1,0 +1,8 @@
+UserParameter=fail2ban.discovery,fail2ban-client status | grep 'Jail list:' | sed -e 's/^.*:\W\+//' -e 's/\(\w\+\)/{"{#JAIL}":"\1"}/g' -e 's/.*/{"data":[\0]}/'
+UserParameter=fail2ban.group_own,ls -l /var/run/fail2ban/fail2ban.sock | awk '{print $4}'
+UserParameter=fail2ban.total_failed[*],fail2ban-client status $1 | grep 'Total failed:' | grep -E -o '[0-9]+'
+UserParameter=fail2ban.total_banned[*],fail2ban-client status $1 | grep 'Total banned:' | grep -E -o '[0-9]+'
+UserParameter=fail2ban.currently_failed[*],fail2ban-client status $1 | grep 'Currently failed:' | grep -E -o '[0-9]+'
+UserParameter=fail2ban.currently_banned[*],fail2ban-client status $1 | grep 'Currently banned:' | grep -E -o '[0-9]+'
+UserParameter=fail2ban.currently_banned_ip[*],fail2ban-client status $1 |grep 'Banned IP list:' | sed 's/.*://g' | sed 's/\t//g'
+

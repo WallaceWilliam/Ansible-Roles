@@ -1,0 +1,26 @@
+## https://github.com/WallaceWilliam
+# meta file for
+---
+galaxy_info:
+  role_name: zabbix_fail2ban
+  author: WallaceWilliam
+  description: zabbix fail2ban sock config
+  license: MIT
+  min_ansible_version: 2.9.0.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - precise
+        - trusty
+        - xenial
+        - bionic
+    - name: Debian
+      versions:
+        - wheezy
+        - jessie
+        - stretch
+  galaxy_tags:
+    - system
+    - packaging
+dependencies: []
+

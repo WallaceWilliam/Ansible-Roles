@@ -1,0 +1,14 @@
+## https://github.com/WallaceWilliam
+# Run as follows:
+# ansible-playbook zabbix_fail2ban.yml -e "hostname=server" -e "ansible_user=root" -kK
+---
+- name: zabbix_fail2ban
+  hosts: "{{ hostname }}"
+  become: yes
+  vars:
+    role_zabbix_fail2ban:
+      'var': 'test'
+
+  roles:
+  - zabbix_fail2ban
+

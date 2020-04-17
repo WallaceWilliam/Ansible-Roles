@@ -1,0 +1,12 @@
+## https://github.com/WallaceWilliam
+
+---
+- name: fail2ban restart  
+  service:
+    name: fail2ban
+    state: restarted
+
+- name: zabbix-agent restart
+  service:
+    name: zabbix-agent
+    state: restarted

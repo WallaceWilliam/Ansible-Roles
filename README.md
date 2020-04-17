@@ -38,3 +38,11 @@ Params:
 -dma_smarthost: smtp server
 
 Example ansible-playbook logon-notify-mail.yml -e "hostname=test2"
+
+### 4) zabbix_fail2ban
+
+Role to config zabbix for monitoring fail2ban
+
+zabbix-agent and fail2ban must be install manual
+
+Role automate steps from https://github.com/hermanekt/zabbix-fail2ban-discovery-

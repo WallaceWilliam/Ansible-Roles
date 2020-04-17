@@ -1,0 +1,5 @@
+## https://github.com/WallaceWilliam
+
+role_zabbix_fail2ban_def:
+  sock: "/var/run/fail2ban/fail2ban.sock"
+  service: "/etc/systemd/system/multi-user.target.wants/fail2ban.service"

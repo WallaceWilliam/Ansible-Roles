@@ -1,0 +1,62 @@
+## https://github.com/WallaceWilliam
+---
+
+# combine Default and User parameters
+- set_fact:
+    _tmp: "{{ role_zabbix_fail2ban }}"
+- set_fact:
+    role_zabbix_fail2ban: "{{ role_zabbix_fail2ban_def | combine(_tmp) }}"
+
+- name: Add group "fail2ban"
+  group:
+    name: fail2ban
+    state: present
+
+- name: Add user "zabbix" to group "fail2ban"
+  user:
+    name: zabbix
+    groups: fail2ban
+    append: yes
+
+- name: check if "{{ role_zabbix_fail2ban.service }}" file exists
+  stat: 
+    path: "{{ role_zabbix_fail2ban.service }}"
+  register: fail2ban_service
+
+- name: add "{{ role_zabbix_fail2ban.service }}" if !{{ fail2ban_service.stat.exists }}
+  shell: "systemctl enable fail2ban"
+  notify:
+  - fail2ban restart
+  when: fail2ban_service.stat.exists == False
+
+- name: Insert/Update "{{ role_zabbix_fail2ban.service }}"
+  blockinfile:
+    path: "{{ role_zabbix_fail2ban.service }}"
+    marker: "## {mark} ANSIBLE MANAGED BLOCK"
+    insertafter: "^\\[Service\\]"
+    block: |
+      ExecStartPost=/bin/sh -c "while ! [ -S {{ role_zabbix_fail2ban.sock }} ]; do sleep 1; done"
+      ExecStartPost=/bin/chgrp fail2ban {{ role_zabbix_fail2ban.sock }}
+      ExecStartPost=/bin/chmod g+w {{ role_zabbix_fail2ban.sock }}
+  register: fb
+
+- name: reload "{{ role_zabbix_fail2ban.service }}"
+  shell: "systemctl daemon-reload"
+  notify:
+  - fail2ban restart
+  when: fb.changed
+
+- name: Copy fail2ban.conf
+  copy:
+    src: "zabbix_agentd.d/fail2ban.conf.j2"
+    dest: "/etc/zabbix/zabbix_agentd.d/fail2ban.conf"
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+  - zabbix-agent restart
+
+#- name: restart zabbix-agent
+#  service:
+#    name: zabbix-agent
+#    state: restarted

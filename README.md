@@ -43,6 +43,34 @@ Example ansible-playbook logon-notify-mail.yml -e "hostname=test2"
 
 Role to config zabbix for monitoring fail2ban
 
-zabbix-agent and fail2ban must be install manual
+zabbix-agent install with task zabbix.yml and fail2ban must be install manual
 
 Role automate steps from https://github.com/hermanekt/zabbix-fail2ban-discovery-
+
+# ansible-tasks
+
+### 1) Zabbix.yml
+
+vars
+
+    zabbix_Server: "zabbix-server"
+
+    zabbix_ServerActive: "zabbix-server"
+
+    agent_Hostname: "client-host"
+
+    agent_TLSPSKIdentity: "client-host"
+
+tasks/zabbix-install.yml
+
+    install/update zabbix-agent 5
+
+    create psk.key if not exist
+
+    configure zabbix_agentd.conf
+
+    open firewall port 10050
+
+tasks/zabbix.yml
+
+    add permif for /var/log/auth.log for read this from zabbix-server

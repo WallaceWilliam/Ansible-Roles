@@ -1,0 +1,27 @@
+## https://github.com/WallaceWilliam
+# Run as follows:
+# ansible-playbook zabbix.yml -e "hostname=server" -e "ansible_user=root" -kK
+---
+- name: zabbix
+  hosts: "{{ hostname }}"
+#  become: yes
+  vars:
+    zabbix_Server: "zabbix-server"
+    zabbix_ServerActive: "zabbix-server"
+    agent_Hostname: "client-host"
+    agent_TLSPSKIdentity: "client-host"
+
+  tasks:
+
+  - name: task1
+    include: tasks/zabbix-install.yml
+
+  - name: task2
+    include: tasks/zabbix.yml
+
+  handlers:
+  - name: Restart zabbix-agent
+    become: true
+    service:
+      name: zabbix-agent
+      state: restarted

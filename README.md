@@ -61,7 +61,7 @@ vars
 
     agent_TLSPSKIdentity: "client-host"
 
-tasks/zabbix-install.yml
+ tasks/zabbix-install.yml
 
     install/update zabbix-agent 5
 
@@ -71,6 +71,6 @@ tasks/zabbix-install.yml
 
     open firewall port 10050
 
-tasks/zabbix.yml
+ ytasks/zabbix.yml
 
-    add permif for /var/log/auth.log for read this from zabbix-server
+    add permit for /var/log/auth.log for read this from zabbix-server

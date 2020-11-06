@@ -1,0 +1,15 @@
+## https://github.com/WallaceWilliam
+# Run as follows:
+# ansible-playbook task_dma.yml -e "hostname=server" -e "ansible_user=root" -kK
+---
+- name: DMA
+  hosts: "{{ hostname }}"
+  become: yes
+  vars:
+    'task_dma_smarthost': 'mail.google.com'
+    task_dma_domain: 'google.com'
+
+  tasks:
+
+  - name: DMA
+    include: tasks/dma.yml

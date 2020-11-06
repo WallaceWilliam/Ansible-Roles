@@ -6,7 +6,8 @@
 
 - name: "Set Zabbix Facts Name"
   set_fact:
-    zabbix_rep: "zabbix-release_5.0-1+{{ ansible_lsb.codename }}_all.deb"
+#    zabbix_rep: "zabbix-release_5.0-1+{{ ansible_lsb.codename }}_all.deb"
+    zabbix_rep: "zabbix-release_5.2-1+ubuntu{{ ansible_lsb.release }}_all.deb"
     zabbix_Server: "{{ zabbix_Server }}"
     zabbix_ServerActive: "{{ zabbix_ServerActive }}"
     agent_Hostname: "{{ agent_Hostname }}"
@@ -14,11 +15,12 @@
     agent_TLSAccept: "psk"
     agent_TLSPSKIdentity: "{{ agent_TLSPSKIdentity }}"
     agent_TLSPSKFile: "/etc/zabbix/psk.key"
-    agent_recreate_psk: no
+    agent_recreate_psk: "{{ agent_recreate_psk | default('no') }}"
 
 - name: "download Zabbix repository {{ zabbix_rep }}"
   get_url:
-    url: "https://repo.zabbix.com/zabbix/5.0/ubuntu/pool/main/z/zabbix-release/{{ zabbix_rep }}"
+#    url: "https://repo.zabbix.com/zabbix/5.0/ubuntu/pool/main/z/zabbix-release/{{ zabbix_rep }}"
+    url: "https://repo.zabbix.com/zabbix/5.2/ubuntu/pool/main/z/zabbix-release/{{ zabbix_rep }}"
     dest: "/tmp/"
 #    mode: '0440'
 
@@ -28,12 +30,27 @@
     deb: "/tmp/{{ zabbix_rep }}"
     state: present
 
-- name: "Install Zabbix Agent"
+- set_fact:
+    packages:
+      - zabbix-agent
+
+- name: Install packages "{{ packages | join(',') }}"
   become: true
   apt:
-    name: zabbix-agent
+    pkg: "{{ packages }}"
     state: latest
     update_cache: yes
+  register: apt_install
+
+#- name: Verify apt_install
+#  debug: var=apt_install
+
+- name: Installed packages
+  set_fact:
+  loop: "{{ apt_install.stdout_lines | default([]) | list_regex_search_groupdict(regex) }}"
+  vars:
+    - regex: '^Unpacking (?P<name>\S+) \((?P<ver_new>\S+)\) (?:over \((?P<ver_old>\S+)\) )?\.{3}$'
+  when: item.name in packages
 
 - name: "Generate PSK"
   local_action: command openssl rand -hex 32
@@ -55,7 +72,7 @@
 
 - name: show psk.key
   debug:
-    msg: "{{ slurp_remote_file['content'] }}"
+    msg: "{{ slurp_remote_file['content'] | b64decode }}"
 ##  debug: msg="{{ item }}"
 ##  with_file:
 ##    - "{{ agent_TLSPSKFile }}"
@@ -70,7 +87,7 @@
   with_items:
     - { regexp: "^#*\\s*Server=", line: "Server={{ zabbix_Server }}" }
     - { regexp: "^#*\\s*ServerActive=", line: "ServerActive={{ zabbix_ServerActive }}" }
-    - { regexp: "^#*\\s*Hostname=", line: "Hostname={{ agent_Hostname}}" }
+    - { regexp: "^#*\\s*Hostname=", line: "Hostname={{ agent_Hostname }}" }
     - { regexp: "^#*\\s*StartAgents=", line: "StartAgents=1" }
     - { regexp: "^#*\\s*TLSConnect=", line: "TLSConnect={{ agent_TLSConnect }}" }
     - { regexp: "^#*\\s*TLSAccept=", line: "TLSAccept={{ agent_TLSAccept }}" }

@@ -1,0 +1,45 @@
+## https://github.com/WallaceWilliam
+---
+
+- name: Install DMA
+  apt:
+    package: dma
+    state: latest
+    dpkg_options: force-confnew,force-confdef
+    install_recommends: no
+#  with_items:
+#    - dma
+
+- name: Set mail system
+  lineinfile:
+   dest: /etc/dma/dma.conf
+   state: present
+   create: yes
+#   regexp: "^\\s*#*SMARTHOST"
+#   line: "SMARTHOST {{ task_dma_smarthost }}# MANAGED BY AMSIBLE"
+   regexp: "{{ item.regexp }}"
+   line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^\\s*#*SMARTHOST", line: "SMARTHOST {{ task_dma_smarthost }}# MANAGED BY AMSIBLE" }
+    - { regexp: "^\\s*#*SECURETRANSFER", line: "SECURETRANSFER # MANAGED BY AMSIBLE" }
+    - { regexp: "^\\s*#*STARTTLS", line: "STARTTLS # MANAGED BY AMSIBLE" }
+  when: task_dma_smarthost is defined
+
+- name: Set mailname
+  copy:
+   dest: /etc/mailname
+#   state: present
+#   create: yes
+#   regexp: "^\\s*#*SMARTHOST"
+   content: "{{ ansible_hostname }}.{{ task_dma_domain }}"
+#  when: task_dma_smarthost is defined
+
+#- name: Set mailname
+#  lineinfile:
+#   dest: /etc/mailname
+#   state: present
+#   create: yes
+#   regexp: "^\\s*#*SMARTHOST"
+#   line: "SMARTHOST {{ task_dma.dma_smarthost }}"
+#  when: taskdma.dma_smarthost is defined
+

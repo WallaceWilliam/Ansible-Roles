@@ -1,0 +1,47 @@
+## https://github.com/WallaceWilliam
+---
+
+- set_fact:
+    packages:
+      - acl
+
+- name: Install packages "{{ packages | join(',') }}"
+  become: true
+  apt:
+    pkg: "{{ packages }}"
+    state: latest
+    update_cache: yes
+  register: apt_install
+
+- name: Installed packages
+  set_fact:
+  loop: "{{ apt_install.stdout_lines | default([]) | list_regex_search_groupdict(regex) }}"
+  vars:
+    - regex: '^Unpacking (?P<name>\S+) \((?P<ver_new>\S+)\) (?:over \((?P<ver_old>\S+)\) )?\.{3}$'
+  when: item.name in packages
+
+- set_fact:
+    files:
+      - '/var/log/auth.log'
+
+- name: Grant "zabbix-agent" read access to a files (acl)
+  become: true
+  acl:
+    path: "{{ item }}"
+    entity: zabbix
+    etype: user
+    permissions: r
+    state: present
+  with_items: "{{ files }}"
+
+- name: Obtain the acl for a specific file
+  acl:
+    path: "{{ item }}"
+  loop: "{{ files }}"
+  register: acl_info
+
+- debug:
+    msg: "{{ item.acl }}"
+  loop: "{{ acl_info.results }}"
+  loop_control:
+    label: "{{ item.item }}"
